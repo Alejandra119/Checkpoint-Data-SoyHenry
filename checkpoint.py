@@ -16,12 +16,11 @@ def Ret_Pregunta01():
     '''
     #Tu código aca:
 
-    df = pd.read_csv("datasets\Fuentes_Consumo_Energia.csv")
-    
-    colombia= df[df['Entity'].isin(['Colombia'])].shape
-    mexico= df[df['Entity'].isin(['Mexico'])].shape
-
-    return (colombia[0],mexico[0])
+    df= pd.read_csv('datasets/Fuentes_Consumo_Energia.csv',sep=',')
+    mascaraCOL=df[(df['Entity']=='Colombia')].shape
+    mascaraME=df[(df['Entity']=='Mexico')].shape
+    resultado=((mascaraCOL[0],mascaraME[0]))
+    return (resultado)
 
 def Ret_Pregunta02():
     '''
@@ -32,13 +31,10 @@ def Ret_Pregunta02():
     '''
     #Tu código aca:
 
-    df = pd.read_csv("datasets\Fuentes_Consumo_Energia.csv")
-
-    df.drop(["Code"], axis="columns", inplace= True)
-    df.drop(["Entity"], axis="columns", inplace= True)
-    cantidad_columnas = df.shape
-
-    return cantidad_columnas[1] 
+    df= pd.read_csv('datasets/Fuentes_Consumo_Energia.csv',sep=',')
+    df.drop(['Code','Entity'],inplace=True,axis=1)
+    columnas=df.shape
+    return (int(columnas[1]))
 
 def Ret_Pregunta03():
     '''
@@ -47,10 +43,10 @@ def Ret_Pregunta03():
     Esta función debe informar la cantidad de registros de la columna Year sin tener en cuenta aquellos con valores faltantes
     retornando ese valor en un dato de tipo entero.
     '''
-    df = pd.read_csv("datasets\Fuentes_Consumo_Energia.csv")
+    df= pd.read_csv('datasets/Fuentes_Consumo_Energia.csv',sep=',')
     
-
-    return df['Year'].dropna().shape[0]
+    Contar_years=df['Year'].dropna().shape[0]
+    return(int(Contar_years[0]))
 
 def Ret_Pregunta04():
     '''
@@ -70,16 +66,11 @@ def Ret_Pregunta04():
     #Tu código aca:
     df = pd.read_csv("datasets\Fuentes_Consumo_Energia.csv")
 
-    df['Consumo_Total'] = (df.Coal_Consumption_EJ*277.778 + 
-                          df.Gas_Consumption_EJ*277.778 +
-                          df.Geo_Biomass_Other_TWh +
-                          df.Hydro_Generation_TWh +
-                          df.Nuclear_Generation_TWh +
-                          df.Solar_Generation_TWh +
-                          df.Wind_Generation_TWh +
-                          df.Oil_Consumption_EJ*277.778)
-
-    return round(float(df[(df.Entity == 'World') & (df.Year == 2019)]['Consumo_Total'].values),2)
+    df['Consumo_Total']=((df['Coal_Consumption_EJ']+df['Gas_Consumption_EJ']+df['Oil_Consumption_EJ'])*277.778 
+                     + df['Geo_Biomass_Other_TWh']+df['Hydro_Generation_TWh']+df['Nuclear_Generation_TWh']
+                     +df['Solar_Generation_TWh']+df['Wind_Generation_TWh'])
+    mascara_w_2019=(df['Entity']=='World') & (df['Year']==2019)
+    return round(float(df[mascara_w_2019].Consumo_Total),2)
 
 def Ret_Pregunta05():
     '''
@@ -91,13 +82,9 @@ def Ret_Pregunta05():
     #Tu código aca:
     df = pd.read_csv("datasets\Fuentes_Consumo_Energia.csv")
 
-    mask = df["Entity"] == "Europe"
-
-    df = df[mask]
-
-    indice = df.Hydro_Generation_TWh.idxmax() 
-
-    return df.Year[indice]
+    Energ_Hid=df[(df['Entity']=='Europe')]
+    anio=Energ_Hid.Hydro_Generation_TWh.idxmax()
+    return df.Year[anio]
 
 def Ret_Pregunta06(m1, m2, m3):
     '''
@@ -115,11 +102,13 @@ def Ret_Pregunta06(m1, m2, m3):
     '''
     #Tu código aca:
 
-    if (m1.shape[1] == m2.shape[0]):
-        if (np.dot(m1,m2).shape[1]== m3.shape[0]):
+    if m1.shape[1]== m2.shape[0]:
+        if np.dot(m1,m2).shape[1]==m3.shape[0]:
             return True
-
-    return False
+        else:
+            return False
+    else:
+        return False
 def Ret_Pregunta07():
     '''
     Debes utilizar Pandas para ingestar en un objeto Dataframe el contenido del archivo provisto
@@ -138,15 +127,12 @@ def Ret_Pregunta07():
     #Tu código aca:
     df = pd.read_csv("datasets\Fuentes_Consumo_Energia.csv")
 
-    pais = ["Argentina","Brazil","Chile","Colombia","Ecuador","Mexico","Peru"]
-
-    mask = (df["Entity"].isin(pais)) & (df["Year"] == 2019)
-    df = df[mask]
-
-    indice = df.Hydro_Generation_TWh.idxmax()
-
-
-    return  df["Entity"][indice]
+    mask= (df['Entity']=='Argentina') | (df['Entity']=='Brazil') | (df['Entity']=='Chile') | (df['Entity']=='Colombia')|(df['Entity']=='Ecuador')| (df['Entity']=='Mexico') | (df['Entity']=='Peru')
+    df2=df[mask]
+    mask2=(df2['Year']==2019)
+    df3=df2[mask2]
+    mask3=df3.Hydro_Generation_TWh.idxmax()
+    return str(df3.Entity[mask3])
 
 def Ret_Pregunta08():
     '''
@@ -158,7 +144,7 @@ def Ret_Pregunta08():
     #Tu código aca:
     df = pd.read_csv("datasets\Fuentes_Consumo_Energia.csv")
 
-    return df["Entity"].nunique()
+    return df['Entity'].unique().size
 
 def Ret_Pregunta09():
     '''
@@ -168,14 +154,13 @@ def Ret_Pregunta09():
     '''
     #Tu código aca:
     
-    df_ejercicio1 = pd.read_csv('./datasets/Tabla1_ejercicio.csv', sep=';')
-    df_ejercicio2 = pd.read_csv('./datasets/Tabla2_ejercicio.csv', sep=';')
-    df_final = pd.merge(df_ejercicio1,df_ejercicio2,on="pers_id").drop_duplicates()
-    
-    score_promedio_femenino = round(df_final[df_final.sexo=="F"].score.mean(),2)
-    score_promedio_masculino = round(df_final[df_final.sexo=="M"].score.mean(),2)
-    tupla_final = (score_promedio_femenino, score_promedio_masculino)
-    return tupla_final
+    df1=pd.read_csv('datasets/Tabla1_ejercicio.csv', sep=';')
+    df2=pd.read_csv('datasets/Tabla2_ejercicio.csv', sep=';')
+    df_general=pd.merge(df1,df2).drop_duplicates()
+    Fem=round(df_general[df_general.sexo=='F'].score.mean(),2)
+    Homb=round(df_general[df_general.sexo=='M'].score.mean(),2)
+    Media=(Fem,Homb)
+    return Media
 
 def Ret_Pregunta10(lista):
     '''
